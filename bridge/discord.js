@@ -61,7 +61,25 @@ class DiscordBridge {
       if(msg.content === 'osu!bridge stats') {
         let channel = msg.channel;
         let member = msg.member;
-        channel.sendMessage(`${greeting.random()} ${member}! I'm currently serving ${this.servers.length} servers!`);
+        channel.send({embed: {
+          color: 0xDC98A4,
+          author: {
+            name: client.user.username,
+            icon_url: client.user.avatarURL
+          },
+          title: 'OsuBridge',
+          url: 'https://github.com/ioncodes/OsuBridge',
+          description: 'Beep Boop!',
+          fields: [{
+            name: '⚡ Servers',
+            value: `Serving ${this.servers.length} servers`
+          }],
+          timestamp: new Date(),
+          footer: {
+            icon_url: 'https://cdn.discordapp.com/avatars/292314830667382785/8be27727f9de394e7878d064263a3e62.png?size=256',
+            text: '© ioncodes (ion#0122)'
+          }
+        }});
       }
       if(msg.content === 'osu!bridge hello') {
         let channel = msg.channel;
