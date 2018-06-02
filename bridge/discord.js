@@ -86,6 +86,11 @@ class DiscordBridge {
         let member = msg.member;
         channel.sendMessage(`${greeting.random()} ${member}!`);
       }
+      if(msg.content === 'osu!bridge help') {
+        // TODO: Implement rich message for commands/help
+        let channel = msg.channel;
+        channel.sendMessage(`Commands: `);
+      }
     });
 
     client.login(process.env.BOT_TOKEN);
