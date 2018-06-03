@@ -15,15 +15,19 @@ class IRCBridge {
       channels: [],
     });
 
-    this.client.addListener('error', function(message) {
+    this.client.addListener('error', (message) => {
       logger.error(message);
     });
 
-    this.client.addListener('pm', function (from, message) {
+    this.client.addListener('registered', () => {
+      logger.info(`Connected to IRC as ${this.username}`);
+    });
+
+    this.client.addListener('pm', (from, message) => {
       logger.info(`Received msg from ${from}: ${message}`);
     });
 
-    this.client.addListener('selfMessage', function (to, message) {
+    this.client.addListener('selfMessage', (to, message) => {
       logger.info(`Sent msg to ${to}: ${message}`);
     });
   }
