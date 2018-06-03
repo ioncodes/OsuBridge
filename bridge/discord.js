@@ -60,7 +60,6 @@ class DiscordBridge {
       }
       if(msg.content === 'osu!bridge stats') {
         let channel = msg.channel;
-        let member = msg.member;
         channel.send({embed: {
           color: 0xDC98A4,
           author: {
@@ -87,9 +86,35 @@ class DiscordBridge {
         channel.sendMessage(`${greeting.random()} ${member}!`);
       }
       if(msg.content === 'osu!bridge help') {
-        // TODO: Implement rich message for commands/help
         let channel = msg.channel;
-        channel.sendMessage(`Commands: `);
+        channel.send({embed: {
+          color: 0xDC98A4,
+          author: {
+            name: client.user.username,
+            icon_url: client.user.avatarURL
+          },
+          title: 'Help',
+          url: 'https://github.com/ioncodes/OsuBridges',
+          description: `Beep Boop! I'm OsuBridge and this is the help menu.`,
+          fields: [{
+            name: 'help',
+            value: 'Shows this menu.'
+          },{
+            name: 'register',
+            value: 'Registers the current channel as bridge to osu!'
+          },{
+            name: 'stats',
+            value: 'Shows global OsuBridge stats!'
+          },{
+            name: 'hello',
+            value: '⚠️ CAUTION ⚠️ Use this only if you have no friends to greet!'
+          }],
+          timestamp: new Date(),
+          footer: {
+            icon_url: 'https://cdn.discordapp.com/avatars/292314830667382785/8be27727f9de394e7878d064263a3e62.png?size=256',
+            text: '© ioncodes (ion#0122)'
+          }
+        }});
       }
     });
 
