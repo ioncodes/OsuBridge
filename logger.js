@@ -7,7 +7,7 @@ if(!fs.existsSync('logs')) {
 
 winston.addColors({
   info: 'green',
-  warn: 'orange',
+  warn: 'yellow',
   error: 'red',
 });
 

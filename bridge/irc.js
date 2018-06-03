@@ -1,4 +1,5 @@
 const irc = require('irc');
+const interconnect = require('./interconnect');
 const logger = require('../logger');
 
 class IRCBridge {
@@ -25,6 +26,7 @@ class IRCBridge {
 
     this.client.addListener('pm', (from, message) => {
       logger.info(`Received msg from ${from}: ${message}`);
+      interconnect.sendDiscordMessage(from, message);
     });
 
     this.client.addListener('selfMessage', (to, message) => {

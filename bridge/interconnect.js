@@ -4,12 +4,12 @@ const IRCBridge = require('./irc');
 const discord = new DiscordBridge();
 const irc = new IRCBridge();
 
-function sendIRCMessage(nick, msg) {
-  irc.sendMessage(nick, msg);
+function sendIRCMessage(nick, from, msg) {
+  irc.sendMessage(nick, `${from}: ${msg}`);
 }
 
-function sendDiscordMessage(server, msg) {
-  discord.sendMessage(server, msg);
+function sendDiscordMessage(nick, msg) {
+  discord.sendMessage(nick, `${nick}: ${msg}`);
 }
 
 exports.sendIRCMessage = sendIRCMessage;

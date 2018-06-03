@@ -36,7 +36,7 @@ function loadServers(cb) {
 
 function addServer(server) {
   db.run(`INSERT INTO servers VALUES ("${server.server}", "${server.channel}", "${server.osu_account}")`);
-  logger.info(`Adding new server: ${server}`);
+  logger.info(`Adding new server: ${server.server}`);
 }
 
 function linkOsuAccount(channel, user) {

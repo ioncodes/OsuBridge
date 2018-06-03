@@ -10,26 +10,34 @@ class DiscordBridge {
       this.servers = servers;
     });
 
-    const client = new Discord.Client();
+    this.client = new Discord.Client();
 
-    client.on('ready', () => {
-      logger.info(`Logged in to Discord as ${client.user.tag}!`);
+    this.client.on('ready', () => {
+      logger.info(`Logged in to Discord as ${this.client.user.tag}!`);
     });
 
-    client.on('message', msg => {
-      if(msg.author === client.user) { return; }
+    this.client.on('message', msg => {
+      if(msg.author === this.client.user) { return; }
       if(msg.content === 'osu!bridge register') {
         let channel = msg.channel;
         let member = msg.member;
         let server = msg.guild;
         if(member.hasPermission('ADMINISTRATOR')) {
-          logger.info(`Registered channel ${channel} on server ${server} (requested by ${member})`);
-          this.addServer({
-            server: server,
-            channel: channel,
-            osu_account: null
+          let found = this.servers.find((s) => {
+            return server == s.server;
           });
-          msg.reply(`registered channel ${channel}!`);
+          if(found) {
+            logger.warn(`${channel} already registered on server ${server} (requested by ${member})`);
+            msg.reply(`channel already linked!`);
+          } else {
+            logger.info(`Registered channel ${channel} on server ${server} (requested by ${member})`);
+            this.addServer({
+              server: server,
+              channel: channel,
+              osu_account: null
+            });
+            msg.reply(`registered channel ${channel}!`);
+          }
         } else {
           logger.warn(`Registering denied (requested by ${member})`);
           msg.reply(`only administrators can register channels!`);
@@ -80,8 +88,8 @@ class DiscordBridge {
         channel.send({embed: {
           color: 0xDC98A4,
           author: {
-            name: client.user.username,
-            icon_url: client.user.avatarURL
+            name: this.client.user.username,
+            icon_url: this.client.user.avatarURL
           },
           title: 'OsuBridge',
           url: 'https://github.com/ioncodes/OsuBridge',
@@ -100,15 +108,15 @@ class DiscordBridge {
       else if(msg.content === 'osu!bridge hello') {
         let channel = msg.channel;
         let member = msg.member;
-        channel.sendMessage(`${greeting.random()} ${member}!`);
+        channel.send(`${greeting.random()} ${member}!`);
       }
       else if(msg.content === 'osu!bridge help') {
         let channel = msg.channel;
         channel.send({embed: {
           color: 0xDC98A4,
           author: {
-            name: client.user.username,
-            icon_url: client.user.avatarURL
+            name: this.client.user.username,
+            icon_url: this.client.user.avatarURL
           },
           title: 'Help',
           url: 'https://github.com/ioncodes/OsuBridge',
@@ -139,18 +147,29 @@ class DiscordBridge {
       else {
         let channel = msg.channel;
         this.servers.forEach((server) => {
-          if(server.channel === channel) {
-            interconnect.sendIRCMessage(server.osu_account, msg.content);
+          if(server.channel == channel) {
+            interconnect.sendIRCMessage(server.osu_account, msg.author.tag, msg.content);
           }
         });
       }
     });
 
-    client.login(process.env.BOT_TOKEN);
+    this.client.login(process.env.BOT_TOKEN);
   }
 
-  sendMessage(server, msg) {
-    // send message to channel
+  sendMessage(nick, msg) {
+    this.servers.forEach((server) => {
+      if(server.osu_account === nick) {
+        let guild = this.client.guilds.find((s) => {
+          return server.server == s;
+        });
+        guild.channels.forEach((channel) => {
+          if(channel == server.channel) {
+            channel.send(msg);
+          }
+        });
+      }
+    });
   }
 
   addServer(server) {
