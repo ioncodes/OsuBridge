@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const logger = require('../logger');
 const greeting = require('greeting');
+const interconnect = require('./interconnect');
 
 class DiscordBridge {
   constructor() {
@@ -9,10 +10,11 @@ class DiscordBridge {
     const client = new Discord.Client();
 
     client.on('ready', () => {
-      console.log(`Logged in as ${client.user.tag}!`);
+      logger.info(`Logged in to Discord as ${client.user.tag}!`);
     });
 
     client.on('message', msg => {
+      if(msg.author === client.user) { return; }
       if(msg.content === 'osu!bridge register') {
         let channel = msg.channel;
         let member = msg.member;
@@ -22,6 +24,7 @@ class DiscordBridge {
           this.servers.push({
             server: server,
             channel: channel,
+            osu_account: null
           });
           msg.reply(`registered channel ${channel}!`);
         } else {
@@ -29,7 +32,17 @@ class DiscordBridge {
           msg.reply(`only administrators can register channels!`);
         }
       }
-      if(msg.content === 'osu!bridge logs') {
+      else if(msg.content.startsWith('osu!bridge link ')) {
+        let channel = msg.channel;
+        let user = msg.content.replace('osu!bridge link ', '');
+        logger.info(`Linking ${user} with ${channel}`);
+        this.servers.forEach((server) => {
+          if(server.channel === channel) {
+            server.osu_account = user;
+          }
+        });
+      }
+      else if(msg.content === 'osu!bridge logs') {
         // DOESNT WORK, THERE'S A BUG IN WINSTON
 
         let member = msg.member;
@@ -58,7 +71,7 @@ class DiscordBridge {
           msg.reply(`only administrators can query logs!`);
         }
       }
-      if(msg.content === 'osu!bridge stats') {
+      else if(msg.content === 'osu!bridge stats') {
         let channel = msg.channel;
         channel.send({embed: {
           color: 0xDC98A4,
@@ -80,12 +93,12 @@ class DiscordBridge {
           }
         }});
       }
-      if(msg.content === 'osu!bridge hello') {
+      else if(msg.content === 'osu!bridge hello') {
         let channel = msg.channel;
         let member = msg.member;
         channel.sendMessage(`${greeting.random()} ${member}!`);
       }
-      if(msg.content === 'osu!bridge help') {
+      else if(msg.content === 'osu!bridge help') {
         let channel = msg.channel;
         channel.send({embed: {
           color: 0xDC98A4,
@@ -116,6 +129,14 @@ class DiscordBridge {
           }
         }});
       }
+      else {
+        let channel = msg.channel;
+        this.servers.forEach((server) => {
+          if(server.channel === channel) {
+            interconnect.sendIRCMessage(server.osu_account, msg.content);
+          }
+        });
+      }
     });
 
     client.login(process.env.BOT_TOKEN);
@@ -123,6 +144,10 @@ class DiscordBridge {
 
   loadServer(server) {
     // init discord server bridge
+  }
+
+  sendMessage(server, msg) {
+    // send message to channel
   }
 }
 

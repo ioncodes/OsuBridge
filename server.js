@@ -1,10 +1,9 @@
 const express = require('express');
 const path = require('path');
-const DiscordBridge = require('./bridge/discord');
 const logger = require('./logger');
+const interconnect = require('./bridge/interconnect');
 
 const app = express();
-const discord = new DiscordBridge();
 
 app.use('/api/discord', require('./api/discord'));
 app.use(express.static('public'));
@@ -14,7 +13,7 @@ app.get('/', (req, res) => {
 });
 
 app.listen(50451, () => {
-  console.info('Running on port 50451');
+  logger.info('Started server on port 50451');
 });
 
 app.use((err, req, res, next) => {
