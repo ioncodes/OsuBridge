@@ -2,10 +2,13 @@ const Discord = require('discord.js');
 const logger = require('../logger');
 const greeting = require('greeting');
 const interconnect = require('./interconnect');
+const database = require('../database');
 
 class DiscordBridge {
   constructor() {
-    this.servers = [];
+    database.loadServers((servers) => {
+      this.servers = servers;
+    });
 
     const client = new Discord.Client();
 
@@ -21,7 +24,7 @@ class DiscordBridge {
         let server = msg.guild;
         if(member.hasPermission('ADMINISTRATOR')) {
           logger.info(`Registered channel ${channel} on server ${server} (requested by ${member})`);
-          this.servers.push({
+          this.addServer({
             server: server,
             channel: channel,
             osu_account: null
@@ -37,8 +40,9 @@ class DiscordBridge {
         let user = msg.content.replace('osu!bridge link ', '');
         logger.info(`Linking ${user} with ${channel}`);
         this.servers.forEach((server) => {
-          if(server.channel === channel) {
+          if(server.channel == channel) {
             server.osu_account = user;
+            database.linkOsuAccount(channel, user);
           }
         });
       }
@@ -142,12 +146,13 @@ class DiscordBridge {
     client.login(process.env.BOT_TOKEN);
   }
 
-  loadServer(server) {
-    // init discord server bridge
-  }
-
   sendMessage(server, msg) {
     // send message to channel
+  }
+
+  addServer(server) {
+    this.servers.push(server);
+    database.addServer(server);
   }
 }
 
