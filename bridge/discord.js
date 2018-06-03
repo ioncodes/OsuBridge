@@ -111,7 +111,7 @@ class DiscordBridge {
             icon_url: client.user.avatarURL
           },
           title: 'Help',
-          url: 'https://github.com/ioncodes/OsuBridges',
+          url: 'https://github.com/ioncodes/OsuBridge',
           description: `Beep Boop! I'm OsuBridge and this is the help menu.`,
           fields: [{
             name: 'help',
