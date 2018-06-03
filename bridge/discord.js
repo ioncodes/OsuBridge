@@ -120,6 +120,9 @@ class DiscordBridge {
             name: 'register',
             value: 'Registers the current channel as bridge to osu!'
           },{
+            name: 'link OSU_ACCOUNT_NAME',
+            value: 'Links the given osu! account to this channel.'
+          },{
             name: 'stats',
             value: 'Shows global OsuBridge stats!'
           },{
